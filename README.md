@@ -1,7 +1,7 @@
 Assignment 2: 2048
 =========
 
-Your task is to implement a game AI for the 2048 game based on simple expectimax search. The game engine is a modification of the code [here](https://gist.github.com/lewisjdeane/752eeba4635b479f8bb2). 
+Your task is to implement a game AI for the 2048 game based on simple expectimax search. The base game engine is using the code from [here](https://gist.github.com/lewisjdeane/752eeba4635b479f8bb2). 
 
 Due date
 -----
@@ -16,17 +16,17 @@ Comment your code generously.
 
 3. Functionality (13 points)
 
-The player should be modelled as a max player, and the computer modeled as a chance player (picking a random open spot and place a 2-tile). 
+Model the AI player as a max player, and the computer as a chance player (picking a random open spot and place a 2-tile). So you need to implement the expectimax algorithm to compute decisions for the AI player. 
 
 You will be graded according to whether you have correctly implemented the following functions/classes. 
 
 - Game simulator (3 points)
 
-You can mostly copy/paste the game engine code to create a simulator class, which can return the game state after the player makes a move from any reasonable game state. 
+You can mostly copy/paste the game engine code to create a game simulator. It will be used to return the game state (and evaluate its score) after the player makes any move from any reasonable game state. 
 
 - Construct a depth-3 game tree (4 points)
 
-Explicitly construct a game tree from any state of the game (like the tree you see in the slides). The tree depth is required to be at least 3, that is, it can represent all the game states of a player-computer-player sequence. 
+Explicitly construct a game tree from any state of the game (like the tree you see in the slides). The tree depth is required to be at least 3, that is, it can represent all the game states of a player-computer-player sequence (the player makes a move, the computer place a tile, and then the player makes another move). 
 
 - Compute expectimax values and optimal moves (6 points)
 
