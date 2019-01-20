@@ -14,7 +14,7 @@ Grading
 
 Comment your code generously. 
 
-3. Functionality (13 points)
+2. Functionality (13 points)
 
 Model the AI player as a max player, and the computer as a chance player (picking a random open spot and place a 2-tile). So you need to implement the expectimax algorithm to compute decisions for the AI player. 
 
