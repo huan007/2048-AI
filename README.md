@@ -18,6 +18,8 @@ Comment your code generously.
 
 Model the AI player as a max player, and the computer as a chance player (picking a random open spot and place a 2-tile). So you need to implement the expectimax algorithm to compute decisions for the AI player. 
 
+You can play the game manually using the arrow keys. Pressing Enter will let AI play the game, and pressing Enter again will stop the AI player. In the starter code, the AI is always taking the "up" action in every step. 
+
 You will be graded according to whether you have correctly implemented the following functions/classes. 
 
 - Game simulator (3 points)
