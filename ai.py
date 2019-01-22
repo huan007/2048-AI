@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, print_function
 import copy
 import random
 MOVES = {0: 'up', 1: 'left', 2: 'down', 3: 'right'}
-ACTIONS = [(0, -1), (-1, 0), (0, 1), (1, 0)]
 
 class Gametree:
 	"""main class for the AI"""
