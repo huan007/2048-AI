@@ -11,7 +11,7 @@ class Gametree:
 	def __init__(self, root_state, depth_of_tree, current_score): 
 		pass
 	# expectimax for computing best move
-	def minimax(self, state):
+	def expectimax(self, state):
 		pass
 	# function to return best decision to game
 	def compute_decision(self):
