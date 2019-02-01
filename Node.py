@@ -11,7 +11,7 @@ class Node:
 
         def addChild(self, child):
             self.children.append(child)
-
+# {{{
 def move(tm, board_size, direction, oldScore):
     newScore = oldScore
     for i in range(0, direction):
@@ -63,6 +63,7 @@ def rotateMatrixClockwise(tm, board_size):
             tm[board_size - 1 - i][board_size - 1 - k] = temp2
             tm[k][board_size - 1 - i] = temp3
             tm[i][k] = temp4
+# }}}
 
 #Build tree steming from the specified node
 def buildTree(node, level, nextPlayer):
