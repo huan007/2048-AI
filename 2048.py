@@ -68,7 +68,12 @@ class Game:
 						self.board_size = event.key - 48
 						self.reset()
 					if event.key == pygame.K_s:
-						self.saveGameState()
+						#self.saveGameState()
+                                                if self.checkIfCanGo():
+                                                        #Hint: Check the use of deepcopy
+                                                        ai = Gametree(copy.deepcopy(self.tileMatrix), 3, self.total_points)
+                                                        direction = ai.compute_decision() 
+                                                        self.move(direction)
 					elif event.key == pygame.K_l:
 						self.loadGameState()
 					elif event.key == pygame.K_u:
@@ -76,12 +81,14 @@ class Game:
 			pygame.display.update()
 	def move(self, direction):
 		self.addToUndo()
+                #Rotate to certain direction to move & merge
 		for i in range(0, direction):
 			self.rotateMatrixClockwise()
 		if self.canMove():
 			self.moveTiles()
 			self.mergeTiles()
 			self.placeRandomTile()
+                #Rotate back to the original direction
 		for j in range(0, (4 - direction) % 4):
 			self.rotateMatrixClockwise()
 		self.printMatrix()
