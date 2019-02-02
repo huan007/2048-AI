@@ -1,5 +1,6 @@
 import copy
 import random
+import math
 from heapq import heappush, heappop
 #Node class
 class Node:
@@ -77,6 +78,7 @@ def rotateMatrixClockwise(tm, board_size):
             tm[i][k] = temp4
 # }}}
 
+# {{{
 #Build tree steming from the specified node
 def buildTree(node, level, nextPlayer):
     if (node is None) or level == 0:
@@ -92,6 +94,10 @@ def buildTree(node, level, nextPlayer):
             tm = copy.deepcopy(node.state)
             #Make a move TODO: Work to insert current score
             newScore = move(tm, node.board_size, i, node.point)
+
+            #Check if the board hasn't changed, if not discard the branch
+            if (isMatrixEqual(tm, node.state, node.board_size)):
+                continue
             #Create a node 
             newNode = Node(tm, "chance", newScore, node.board_size)
             #TODO Evaluate the value of the new node
@@ -123,6 +129,7 @@ def buildTree(node, level, nextPlayer):
             chance = 1 / count
         for n in node.children:
             n.setChance(chance)
+# }}}
 
 def terminal(node):
     if len(node.children) == 0:
@@ -136,26 +143,50 @@ def payoff(node):
     board = node.state
     # Sorted values in tuples: (position, x, y)
     sortedValues = []
+    tileBuckets = {}
     spaceCount = 0
     for y in range(0, board_size):
         for x in range(0, board_size):
             #Going through the board now
-            # Preprocess the board by adding them to a priority queue
             if board[x][y] == 0:
                 spaceCount = spaceCount + 1
             else: 
-                heappush(sortedValues, (board[x][y], x, y))
+                # Preprocess the grid
+                sortedValues.append((board[x][y], x, y))
+                # Counting number of of same tiles
+                # Creating new bucket if needed
+                if board[x][y] not in tileBuckets:
+                    tileBuckets[board[x][y]] = []
+                tileBuckets[board[x][y]].append((board[x][y], x, y))
+    #Sort the tiles
+    sortedValues.sort(reverse=True)
+    largestTile = sortedValues[0]
+    openSpaceRating = 0.3 * spaceCount
+    randomness = Node.staleFactor * random.random()
+    closenessRating = 0
+    cornerRating = 0
 
-    largestTile = (0,0,0)
+
+    # Check if the fourth largest tiles are close together
+    for i in range(len(sortedValues) // 2):
+        closenessRating += 2 * rateTilesDistance(sortedValues[i], sortedValues[i+1])
+
+    # Check if same kinda are far apart
+    for tile, bucket in tileBuckets.items():
+        for i in range(len(bucket)):
+            for j in range(i+1, len(bucket)):
+                closenessRating += rateTilesDistance(bucket[i], bucket[j])
+
     #Check if the largest tile is in a corner
     coordinates = largestTile[1:3]
     if coordinates == (0,0) or coordinates == (0, board_size-1) or coordinates == (board_size-1, 0) or coordinates == (board_size-1, board_size-1):
         #TODO: Good position, give positive values
-        return 1 + (0.3 * spaceCount) + (Node.staleFactor * random.random())
+        cornerRating = 1
     else:
         #TODO: Bad position, punish for being in this position
-        return (0.3 * spaceCount) + (Node.staleFactor * random.random())
-    return node.point
+        cornerRating = -10
+
+    return openSpaceRating + closenessRating + cornerRating + randomness
 
 def max_player(node):
     if node.nextTurn == "max":
@@ -172,6 +203,26 @@ def chance_player(node):
 def chance(node):
     return node.chance
 
+def rateTilesDistance(tile1, tile2):
+    # Get coordinates of tile1
+    x1 = tile1[1]
+    y1 = tile1[2]
+    # Get coordinates of tile2
+    x2 = tile2[1]
+    y2 = tile2[2]
+    # Calculate euclidean distance
+    distance = math.sqrt( ((x1-x2)**2) + ((y1-y2)**2))
+    #If tiles are right next to each other
+    if distance == 1:
+        return 1
+    #If tiles are diagonal to each other
+    if 1 < distance < 2:
+        return 0
+    #Punish for tiles that are far apart
+    else:
+        return -2
+
+
 def printMatrix(tm, board_size):
     for y in range(0, board_size):
         for x in range(0, board_size):
@@ -180,3 +231,9 @@ def printMatrix(tm, board_size):
             print(tm[x][y], end="")
         print("")
     ("")
+
+def isMatrixEqual(m1, m2, board_size):
+    if m1 == m2:
+        return True
+    else:
+        return False

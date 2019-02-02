@@ -53,7 +53,6 @@ class Gametree:
             first = values[0][0]
             last = values[0][0]
             for i in range(len(values)):
-                print("Value: ", values[i][0])
                 if values[i][0] > last:
                     last = values[i][0]
             if first == last:

@@ -42,7 +42,7 @@ class Game:
 			if auto:
 				if self.checkIfCanGo():
 					#Hint: Check the use of deepcopy
-					ai = Gametree(copy.deepcopy(self.tileMatrix), 3, self.total_points)
+					ai = Gametree(copy.deepcopy(self.tileMatrix), 5, self.total_points)
 					direction = ai.compute_decision() 
 					self.move(direction)
 				else:
