@@ -1,16 +1,25 @@
 import copy
+import random
 #Node class
 class Node:
 
         #Constructor
-        def __init__(self, state, value=0, board_size=4):
+        def __init__(self, state, nextTurn, point=0, board_size=4):
             self.state = state
-            self.value = value
+            self.nextTurn = nextTurn
+            self.point = point
             self.board_size = board_size
             self.children = []
 
         def addChild(self, child):
             self.children.append(child)
+
+        def children(self):
+            return self.children
+
+        def setChance(self, chance):
+            self.chance = chance
+
 # {{{
 def move(tm, board_size, direction, oldScore):
     newScore = oldScore
@@ -68,11 +77,10 @@ def rotateMatrixClockwise(tm, board_size):
 #Build tree steming from the specified node
 def buildTree(node, level, nextPlayer):
     if (node is None) or level == 0:
-        print("Depth of 0!")
         return
 
-    print("Current state")
-    printMatrix(node.state, 4)
+    #print("Current state")
+    #printMatrix(node.state, 4)
     #Next player: Me
     if nextPlayer % 2 == 0:
         #Expand by speculating 4 directions
@@ -80,13 +88,13 @@ def buildTree(node, level, nextPlayer):
             #Create a deep copy of the current state
             tm = copy.deepcopy(node.state)
             #Make a move TODO: Work to insert current score
-            newScore = move(tm, node.board_size, i, node.value)
-            #DEBUG print out
-            print("New state (ME): ", i)
-            printMatrix(tm, node.board_size)
+            newScore = move(tm, node.board_size, i, node.point)
+            ##DEBUG print out
+            #print("New state (ME): ", i)
+            #printMatrix(tm, node.board_size)
             #Create a node 
-            newNode = Node(tm, newScore, node.board_size)
-            print("New Score: ", newScore)
+            newNode = Node(tm, "chance", newScore, node.board_size)
+            #print("New Score: ", newScore)
             #TODO Evaluate the value of the new node
             #Expand tree of the new node
             buildTree(newNode, level-1, (nextPlayer + 1) % 2)
@@ -95,22 +103,54 @@ def buildTree(node, level, nextPlayer):
     #Next player: Computer
     else:
         #Check every slot to see if we have an empty spot, fill it in
+        count = 0
         for y in range(0, node.board_size):
             for x in range(0, node.board_size):
                 #If we found an empty space then add a "2" tile to it
                 if node.state[x][y] == 0:
+                    count = count + 1
                     #Create a deep copy of the current state
                     tm = copy.deepcopy(node.state)
                     #Add new tile
                     tm[x][y] = 2
-                    #DEBUG print out
-                    print("New state (CP): ")
-                    printMatrix(tm, node.board_size)
-                    newNode = Node(tm, node.value, node.board_size)
+                    ##DEBUG print out
+                    #print("New state (CP): ")
+                    #printMatrix(tm, node.board_size)
+                    newNode = Node(tm, "max", node.point, node.board_size)
                     #TODO Evaluate the value of the new node
                     #Expand tree of the new node
                     buildTree(newNode, level-1, (nextPlayer + 1) % 2)
-        pass
+        chance = 0
+        if count != 0:
+            chance = 1 / count
+        for n in node.children:
+            n.setChance(chance)
+
+def terminal(node):
+    if len(node.children) == 0:
+        return True
+    else:
+        return False
+
+# This function will calculate the payoff of any given state
+def payoff(node):
+    #Dummy variable, just giving out random value from 0 to 1
+    return node.point
+
+def max_player(node):
+    if node.nextTurn == "max":
+        return True
+    else:
+        return False
+
+def chance_player(node):
+    if node.nextTurn == "chance":
+        return True
+    else:
+        return False
+
+def chance(node):
+    return node.chance
 
 def printMatrix(tm, board_size):
     for y in range(0, board_size):
@@ -119,4 +159,4 @@ def printMatrix(tm, board_size):
                 print(" | ", end="")
             print(tm[x][y], end="")
         print("")
-    print("")
+    ("")
