@@ -1,5 +1,6 @@
 import copy
 import random
+from heapq import heappush, heappop
 #Node class
 class Node:
         staleFactor = 0
@@ -133,18 +134,21 @@ def terminal(node):
 def payoff(node):
     board_size = node.board_size
     board = node.state
-    largestTile = (0,0,0)
+    # Sorted values in tuples: (position, x, y)
+    sortedValues = []
     spaceCount = 0
     for y in range(0, board_size):
         for x in range(0, board_size):
             #Going through the board now
-            if board[x][y] > largestTile[0]:
-                largestTile = (board[x][y], x, y)
+            # Preprocess the board by adding them to a priority queue
             if board[x][y] == 0:
                 spaceCount = spaceCount + 1
+            else: 
+                heappush(sortedValues, (board[x][y], x, y))
 
+    largestTile = (0,0,0)
     #Check if the largest tile is in a corner
-    coordinates = largestTile[1:-1]
+    coordinates = largestTile[1:3]
     if coordinates == (0,0) or coordinates == (0, board_size-1) or coordinates == (board_size-1, 0) or coordinates == (board_size-1, board_size-1):
         #TODO: Good position, give positive values
         return 1 + (0.3 * spaceCount) + (Node.staleFactor * random.random())
