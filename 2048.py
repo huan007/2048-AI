@@ -70,6 +70,7 @@ class Game:
 					if event.key == pygame.K_s:
 						#self.saveGameState()
                                                 if self.checkIfCanGo():
+                                                        print("===========================")
                                                         #Hint: Check the use of deepcopy
                                                         ai = Gametree(copy.deepcopy(self.tileMatrix), 3, self.total_points)
                                                         direction = ai.compute_decision() 

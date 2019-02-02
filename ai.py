@@ -23,16 +23,19 @@ class Gametree:
 	# expectimax for computing best move
 	def expectimax(self, node):
             if terminal(node):
+                print("Terminal")
                 return payoff(node)
             elif max_player(node):
-                value = -infinity
-                for n in children(node):
-                    value = max(value, expectimax(n))
+                print("Max Player")
+                value = float("-inf")
+                for n in node.children:
+                    value = max(value, self.expectimax(n))
                 return value
             elif chance_player(node):
+                print("Chance Player")
                 value = 0
-                for n in children(node):
-                    value = value + expectimax(n) * chance(n)
+                for n in node.children:
+                    value = value + self.expectimax(n) * chance(n)
                 return value
             else:
                 print("Error!")
@@ -50,16 +53,15 @@ class Gametree:
             first = values[0][0]
             last = values[0][0]
             for i in range(len(values)):
+                print("Value: ", values[i][0])
                 if values[i][0] > last:
                     last = values[i][0]
             if first == last:
-                print("Had to pick random")
                 return random.randint(0,4)
 
             #Pick the best choice
             bestChoice = nlargest(1, values)
             #Return direction
-            print("Informed choice")
             return bestChoice[0][1]
 
             

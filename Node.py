@@ -89,12 +89,8 @@ def buildTree(node, level, nextPlayer):
             tm = copy.deepcopy(node.state)
             #Make a move TODO: Work to insert current score
             newScore = move(tm, node.board_size, i, node.point)
-            ##DEBUG print out
-            #print("New state (ME): ", i)
-            #printMatrix(tm, node.board_size)
             #Create a node 
             newNode = Node(tm, "chance", newScore, node.board_size)
-            #print("New Score: ", newScore)
             #TODO Evaluate the value of the new node
             #Expand tree of the new node
             buildTree(newNode, level-1, (nextPlayer + 1) % 2)
@@ -113,13 +109,12 @@ def buildTree(node, level, nextPlayer):
                     tm = copy.deepcopy(node.state)
                     #Add new tile
                     tm[x][y] = 2
-                    ##DEBUG print out
-                    #print("New state (CP): ")
-                    #printMatrix(tm, node.board_size)
                     newNode = Node(tm, "max", node.point, node.board_size)
                     #TODO Evaluate the value of the new node
                     #Expand tree of the new node
                     buildTree(newNode, level-1, (nextPlayer + 1) % 2)
+                    #Append to root node
+                    node.addChild(newNode)
         chance = 0
         if count != 0:
             chance = 1 / count
