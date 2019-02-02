@@ -2,6 +2,8 @@ import copy
 import random
 #Node class
 class Node:
+        staleFactor = 0
+        lastMove = 0
 
         #Constructor
         def __init__(self, state, nextTurn, point=0, board_size=4):
@@ -129,7 +131,26 @@ def terminal(node):
 
 # This function will calculate the payoff of any given state
 def payoff(node):
-    #Dummy variable, just giving out random value from 0 to 1
+    board_size = node.board_size
+    board = node.state
+    largestTile = (0,0,0)
+    spaceCount = 0
+    for y in range(0, board_size):
+        for x in range(0, board_size):
+            #Going through the board now
+            if board[x][y] > largestTile[0]:
+                largestTile = (board[x][y], x, y)
+            if board[x][y] == 0:
+                spaceCount = spaceCount + 1
+
+    #Check if the largest tile is in a corner
+    coordinates = largestTile[1:-1]
+    if coordinates == (0,0) or coordinates == (0, board_size-1) or coordinates == (board_size-1, 0) or coordinates == (board_size-1, board_size-1):
+        #TODO: Good position, give positive values
+        return 1 + (0.3 * spaceCount) + (Node.staleFactor * random.random())
+    else:
+        #TODO: Bad position, punish for being in this position
+        return (0.3 * spaceCount) + (Node.staleFactor * random.random())
     return node.point
 
 def max_player(node):

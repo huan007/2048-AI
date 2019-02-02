@@ -61,6 +61,14 @@ class Gametree:
 
             #Pick the best choice
             bestChoice = nlargest(1, values)
+            if (bestChoice[0][1] != Node.lastMove):
+                # Reset staleFactor
+                Node.lastMove = bestChoice[0][1]
+                Node.staleFactor = 0
+            else:
+                #If we're picking the same direction, increase stale factor
+                Node.staleFactor = Node.staleFactor + 0.4
+
             #Return direction
             return bestChoice[0][1]
 
