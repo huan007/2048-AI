@@ -210,6 +210,10 @@ def payoff(node):
     difference = 0
     for y in range(node.board_size):
         for x in range(node.board_size):
+            # Here's the core of my algorithm, we weight each tile base on the 
+            # position of the tile and the value it contain. A higher value
+            # in the corner or next to the corner should weight more than lower
+            # value. This is an implementation of CMA-ES
             baseRating += board[x][y] * Simulator.weightMatrix[x][y]
             #Going through the board now
             if board[x][y] == 0:
