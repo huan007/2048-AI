@@ -2,6 +2,10 @@ import copy
 import random
 import math
 from heapq import heappush, heappop
+# Name:  Huan Nguyen
+# PID:   A12871523
+# Email: hpn007@ucsd.edu
+
 #Node class
 class Node:
         staleFactor = 0

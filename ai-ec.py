@@ -5,6 +5,10 @@ from heapq import nlargest
 from Node import *
 MOVES = {0: 'up', 1: 'left', 2: 'down', 3: 'right'}
 
+# Name:  Huan Nguyen
+# PID:   A12871523
+# Email: hpn007@ucsd.edu
+
 class Gametree:
 	"""main class for the AI"""
 	# Hint: Two operations are important. Grow a game tree, and then compute minimax score.
