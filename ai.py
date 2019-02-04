@@ -14,7 +14,6 @@ class Gametree:
             #State will be a 2d matrix. With the mini matrix being the column,
             #NOT the ROW
 
-            #TODO Change 4 to generic board size
             self.rootNode = Node(root_state, "max", current_score, 4)
             self.depth_of_tree = depth_of_tree
 
@@ -56,7 +55,7 @@ class Gametree:
             first = values[0][0]
             repeatCount = 0
             for i in range(len(values)):
-                print("(",values[i][1],") Value: ", values[i][0])
+                #print("(",values[i][1],") Value: ", values[i][0])
                 if values[i][0] == first:
                     repeatCount += 1
             if repeatCount == len(values):
@@ -65,15 +64,8 @@ class Gametree:
 
             #Pick the best choice
             bestChoice = nlargest(1, values)
-            if (bestChoice[0][1] != Node.lastMove):
-                # Reset staleFactor
-                Node.lastMove = bestChoice[0][1]
-                Node.staleFactor = 0
-            else:
-                #If we're picking the same direction, increase stale factor
-                Node.staleFactor = Node.staleFactor + 0.1
 
-            print("Choosing direction: ", bestChoice[0][1])
+            #print("Choosing direction: ", bestChoice[0][1])
             #Return direction
             return bestChoice[0][1]
 
@@ -81,10 +73,13 @@ class Gametree:
 
 
 class Simulator:
-    weightMatrix = [[4**15, 4**8,  4**7, 4**0], 
-                    [4**14, 4**9,  4**6, 4**1],
-                    [4**13, 4**10, 4**5, 4**2],
-                    [4**12, 4**11, 4**4, 4**3]]
+    weightMatrix = [[8**15, 8**8,  8**7, 8**0], 
+                    [8**14, 8**9,  8**6, 8**1],
+                    [8**13, 8**10, 8**5, 8**2],
+                    [8**12, 8**11, 8**4, 8**3]]
+
+    weightScale = 0.00000001
+    spaceScale = 50
 
     # {{{
     #Build tree steming from the specified node
@@ -92,15 +87,13 @@ class Simulator:
         if (node is None) or level == 0:
             return
 
-        #print("Current state")
-        #printMatrix(node.state, 4)
         #Next player: Me
         if nextPlayer % 2 == 0:
             #Expand by speculating 4 directions
             for i in range(0, 4):
                 #Create a deep copy of the current state
                 tm = copy.deepcopy(node.state)
-                #Make a move TODO: Work to insert current score
+                #Make a move 
                 newScore = move(tm, node.board_size, i, node.point)
                 #Check if the board hasn't changed, if not discard the branch
                 if (isMatrixEqual(tm, node.state, node.board_size)):
@@ -127,7 +120,6 @@ class Simulator:
                         #Add new tile
                         tm[x][y] = 2
                         newNode = Node(tm, "max", node.point, node.board_size)
-                        #TODO Evaluate the value of the new node
                         #Expand tree of the new node
                         Simulator.buildTree(newNode, level-1, (nextPlayer + 1) % 2)
                         #Append to root node
@@ -139,7 +131,7 @@ class Simulator:
                 n.setChance(chance)
     # }}}
 
-# {{{
+# {{{ Next section is mostly codes adapted from 2048.py
 def move(tm, board_size, direction, oldScore):
     newScore = oldScore
     for i in range(0, direction):
@@ -194,6 +186,7 @@ def rotateMatrixClockwise(tm, board_size):
 # }}}
 
 
+# Determine whether or not a node is terminal
 def terminal(node):
     if len(node.children) == 0:
         return True
@@ -205,37 +198,84 @@ def payoff(node):
     board_size = node.board_size
     board = node.state
     # Sorted values in tuples: (position, x, y)
-    value = 0
-    for y in range(node.board_size):
-        for x in range(node.board_size):
-            value += board[x][y] * Simulator.weightMatrix[x][y]
+    baseRating = 0
+    spaceRating = 0
+    differenceRating = 0
 
     spaceCount = 0
-    for y in range(0, board_size):
-        for x in range(0, board_size):
+    difference = 0
+    for y in range(node.board_size):
+        for x in range(node.board_size):
+            baseRating += board[x][y] * Simulator.weightMatrix[x][y]
             #Going through the board now
             if board[x][y] == 0:
                 spaceCount = spaceCount + 1
+            # Check left neighbor
+            if (x-1) >= 0:
+                if board[x-1][y] != 0:
+                    difference += abs(board[x][y] - board[x-1][y])
+            # Check right neighbor
+            if (x+1) < node.board_size:
+                if board[x+1][y] != 0:
+                    difference += abs(board[x][y] - board[x+1][y])
+            # Check up neighbor
+            if (y-1) >= 0:
+                if board[x][y-1] != 0:
+                    difference += abs(board[x][y] - board[x][y-1])
+            # Check down neighbor
+            if (y+1) < node.board_size:
+                if board[x][y+1] != 0:
+                    difference += abs(board[x][y] - board[x][y+1])
 
-    value += spaceCount * 50
 
-    return value
+    baseRating = baseRating * Simulator.weightScale
+    spaceRating = spaceCount * Simulator.spaceScale
 
+    finalRating = baseRating + spaceRating
+
+
+    # Check if we go into bad position, poison it
+    # Here we check each direction see which one we can move
+    tm = copy.deepcopy(node.state)
+    move(tm, node.board_size, 0, node.point)
+    canUp = not (isMatrixEqual(node.state, tm, node.board_size))
+    tm = copy.deepcopy(node.state)
+    move(tm, node.board_size, 1, node.point)
+    canLeft = not (isMatrixEqual(node.state, tm, node.board_size))
+    tm = copy.deepcopy(node.state)
+    move(tm, node.board_size, 2, node.point)
+    canDown = not (isMatrixEqual(node.state, tm, node.board_size))
+    tm = copy.deepcopy(node.state)
+    move(tm, node.board_size, 3, node.point)
+    canRight = not (isMatrixEqual(node.state, tm, node.board_size))
+
+
+    # If we can only move down, punish the AI
+    if (not canUp) and (not canLeft) and (not canRight) and canDown:
+        return -(finalRating)
+    
+    
+    return finalRating
+
+# Determine if a node is max player
 def max_player(node):
     if node.nextTurn == "max":
         return True
     else:
         return False
 
+# Determine if a node is chance player
 def chance_player(node):
     if node.nextTurn == "chance":
         return True
     else:
         return False
 
+# Get the chance of the node happening
 def chance(node):
     return node.chance
 
+# Calculate euclidean distance of two nodes
 def distance(tile1, tile2):
     # Get coordinates of tile1
     x1 = tile1[1]
@@ -246,6 +286,13 @@ def distance(tile1, tile2):
     # Calculate euclidean distance
     return math.sqrt( ((x1-x2)**2) + ((y1-y2)**2))
 
+# Check if two matrices are equal
+def isMatrixEqual(m1, m2, board_size):
+    if m1 == m2:
+        return True
+    else:
+        return False
+
 def printMatrix(tm, board_size):
     for y in range(0, board_size):
         for x in range(0, board_size):
@@ -254,9 +301,3 @@ def printMatrix(tm, board_size):
             print(tm[x][y], end="")
         print("")
     ("")
-
-def isMatrixEqual(m1, m2, board_size):
-    if m1 == m2:
-        return True
-    else:
-        return False

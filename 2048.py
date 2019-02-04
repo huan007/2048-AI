@@ -68,13 +68,7 @@ class Game:
 						self.board_size = event.key - 48
 						self.reset()
 					if event.key == pygame.K_s:
-						#self.saveGameState()
-                                                if self.checkIfCanGo():
-                                                        print("===========================")
-                                                        #Hint: Check the use of deepcopy
-                                                        ai = Gametree(copy.deepcopy(self.tileMatrix), 3, self.total_points)
-                                                        direction = ai.compute_decision() 
-                                                        self.move(direction)
+						self.saveGameState()
 					elif event.key == pygame.K_l:
 						self.loadGameState()
 					elif event.key == pygame.K_u:
