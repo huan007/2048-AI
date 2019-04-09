@@ -32,8 +32,10 @@ class Game:
 		self.scorefont = pygame.font.SysFont("arial", 30)
 		self.tileMatrix = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
 		self.undoMat = []
+		self.stats = {}
+		self.numPlays = 0
 	def loop(self, fromLoaded = False):
-		auto = False
+		auto = True
 		if not fromLoaded:
 			self.placeRandomTile()
 			self.placeRandomTile()
@@ -105,6 +107,8 @@ class Game:
 		self.surface.blit(label, (50, 100))
 		self.surface.blit(label2, (50, 200))
 		self.surface.blit(label3, (50, 300))
+		self.reset()
+		auto = True
 	def placeRandomTile(self):
 		while True:
 			i = random.randint(0,self.board_size-1)
@@ -142,10 +146,28 @@ class Game:
 					return True
 		return False
 	def reset(self):
-		self.total_points = 0
-		self.surface.fill(BLACK)
-		self.tileMatrix = [[0 for i in range(self.board_size)] for j in range(self.board_size)]
-		self.loop()
+                self.numPlays += 1
+                #Perform statistic check
+                largestValue = 0
+                for i in range(4):
+                    for j in range(4):
+                        if self.tileMatrix[i][j] > largestValue:
+                            largestValue = self.tileMatrix[i][j]
+
+                if largestValue > 0:
+                    valueString = str(largestValue)
+                    if valueString not in self.stats:
+                        self.stats[valueString] = 0
+                    self.stats[valueString] += 1
+
+                print("---------Stats-----------")
+                print("Games Played: ", self.numPlays)
+                for tile in self.stats:
+                    print(tile, ": ", self.stats[tile] / self.numPlays * 100, "%")
+                self.total_points = 0
+                self.surface.fill(BLACK)
+                self.tileMatrix = [[0 for i in range(self.board_size)] for j in range(self.board_size)]
+                self.loop()
 	def canMove(self):
 		tm = self.tileMatrix
 		for i in range(0, self.board_size):
