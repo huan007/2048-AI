@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 import copy
 import random
+import time
 from heapq import nlargest
 from Node import *
 
@@ -23,39 +24,50 @@ class Gametree:
 
         self.rootNode = Node(root_state, "max", current_score, 4)
         self.depth_of_tree = depth_of_tree
-
+        self.m_callCount = 0
+        self.m_dupCount = 0
+        self.m_memory_counts = {}
+        self.m_memory = {}
         pass
 
     # expectimax for computing best move
     def expectimax(self, node):
-        if terminal(node):
-            # print("Terminal")
-            return payoff(node)
-        elif max_player(node):
-            # print("Max Player")
-            value = float("-inf")
-            for n in node.children:
-                value = max(value, self.expectimax(n))
-            return value
-        elif chance_player(node):
-            # print("Chance Player")
-            value = 0
-            for n in node.children:
-                value = value + self.expectimax(n) * chance(n)
-            return value
+        self.m_callCount += 1
+        if not node in self.m_memory:
+            self.m_memory_counts[node] = 1
+            # Do the work
+            if terminal(node):
+                # print("Terminal")
+                self.m_memory[node] = payoff(node)
+                return payoff(node)
+            elif max_player(node):
+                # print("Max Player")
+                value = float("-inf")
+                for n in node.children:
+                    value = max(value, self.expectimax(n))
+                self.m_memory[node] = value
+                return value
+            elif chance_player(node):
+                # print("Chance Player")
+                value = 0
+                for n in node.children:
+                    value = value + self.expectimax(n) * chance(n)
+                self.m_memory[node] = value
+                return value
+            else:
+                print("Error!")
         else:
-            print("Error!")
+            return self.m_memory[node]
+
+
 
     # function to return best decision to game
     def compute_decision(self):
         # This is where we should construct the tree
-        print('-------------New Compute-----------')
         Simulator.initAndBuildTree(self.rootNode, self.depth_of_tree, 0)
-        print('Total duplicate count: {}'.format(str(Simulator.m_dupCount)))
-        print('Total call count: {}'.format(str(Simulator.m_callCount)))
-        print('Duplicate Rate: {}'.format(str(Simulator.m_dupCount / Simulator.m_callCount)))
 
         # Assuming that we already have 4 different child
+        self.m_memory = {}
         values = []
         for i in range(len(self.rootNode.children)):
             nextChild = self.rootNode.children[i]
@@ -114,8 +126,6 @@ class Simulator:
         else:
             Simulator.m_counts[string] += 1
             Simulator.m_dupCount += 1
-            if level > 2:
-                print('State visited again!\nState ID: {}\nTime Visited: {}'.format(string, Simulator.m_counts[string]))
 
         # Next player: Me
         if nextPlayer % 2 == 0:
