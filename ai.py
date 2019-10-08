@@ -72,6 +72,10 @@ class Gametree:
 
     # function to return best decision to game
     def compute_decision(self):
+        # grid = self.rootNode.state
+        # if (grid[3][0] == grid[2][1] == grid[3][1]):
+        #    if (grid[3][0] != 0) and (grid[2][1] != 0) and (grid[3][1] != 0):
+        #    return 3
         # This is where we should construct the tree
         Simulator.initAndBuildTree(self.rootNode, self.depth_of_tree, 0)
 
