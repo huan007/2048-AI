@@ -318,7 +318,7 @@ def payoff(node):
 
     # If we can only move down, punish the AI
     if (not canUp) and (not canLeft) and (not canRight) and canDown:
-        return -(finalRating)
+        return 0
 
     return finalRating
 
