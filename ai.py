@@ -268,6 +268,8 @@ def payoff(node):
 
     spaceCount = 0
     difference = 0
+    tileMap = {}
+    smoothRating = 0
     for y in range(node.board_size):
         for x in range(node.board_size):
             # Here's the core of my algorithm, we weight each tile base on the 
@@ -278,27 +280,26 @@ def payoff(node):
             # Going through the board now
             if board[x][y] == 0:
                 spaceCount = spaceCount + 1
-            # Check left neighbor
-            if (x - 1) >= 0:
-                if board[x - 1][y] != 0:
-                    difference += abs(board[x][y] - board[x - 1][y])
-            # Check right neighbor
-            if (x + 1) < node.board_size:
-                if board[x + 1][y] != 0:
-                    difference += abs(board[x][y] - board[x + 1][y])
-            # Check up neighbor
-            if (y - 1) >= 0:
-                if board[x][y - 1] != 0:
-                    difference += abs(board[x][y] - board[x][y - 1])
-            # Check down neighbor
-            if (y + 1) < node.board_size:
-                if board[x][y + 1] != 0:
-                    difference += abs(board[x][y] - board[x][y + 1])
+            titevalue = board[x][y]
+            if not titevalue in tileMap:
+                tileMap[titevalue] = []
+            tileMap[titevalue].append((x,y))
+    for value, coordinates in tileMap.items():
+        length = len(coordinates)
+        for i in range(length):
+            for j in range(i+1, length):
+                coordinate1 = coordinates[i]
+                coordinate2 = coordinates[j]
+                if (abs(coordinate1[0] - coordinate2[0]) == 0) and (abs(coordinate1[1] - coordinate2[1]) == 1):
+                    smoothRating += 1
+                elif (abs(coordinate1[0] - coordinate2[0]) == 1) and (abs(coordinate1[1] - coordinate2[1]) == 0):
+                    smoothRating += 1
 
     baseRating = baseRating * Simulator.weightScale
     spaceRating = spaceCount * Simulator.spaceScale
+    smoothRating = smoothRating * 50
 
-    finalRating = baseRating + spaceRating
+    finalRating = baseRating + spaceRating + smoothRating
 
     # Check if we go into bad position, poison it
     # Here we check each direction see which one we can move
