@@ -28,7 +28,13 @@ class Gametree:
         self.m_dupCount = 0
         self.m_memory_counts = {}
         self.m_memory = {}
-        pass
+        largest = largestTile(root_state)
+        if (largest < 2048):
+            self.depth_of_tree = 3
+        elif largest < 4096:
+            self.depth_of_tree = 5
+        else:
+            self.depth_of_tree = 7
 
     # expectimax for computing best move
     def expectimax(self, node):
@@ -108,10 +114,10 @@ class Simulator:
     m_memory = {}
 
     def initAndBuildTree(node, level, nextPlayer):
+        Simulator.m_memory = {}
         Simulator.m_counts = {}
         Simulator.m_dupCount = 0
         Simulator.m_callCount = 0
-        Simulator.m_memory = {}
         Simulator.buildTree(node, level, nextPlayer)
     # {{{
     # Build tree steming from the specified node
@@ -376,3 +382,11 @@ def stateToString(matrix, level):
         string += ';'
     string += str(level)
     return string
+
+def largestTile(matrix):
+    largest = 0
+    for r in range(len(matrix)):
+        for c in range(len(matrix[r])):
+            if matrix[r][c] > largest:
+                largest = matrix[r][c]
+    return largest

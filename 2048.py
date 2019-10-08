@@ -46,7 +46,7 @@ class Game:
             if auto:
                 if self.checkIfCanGo():
                     # Hint: Check the use of deepcopy
-                    ai = Gametree(copy.deepcopy(self.tileMatrix), 5, self.total_points)
+                    ai = Gametree(copy.deepcopy(self.tileMatrix), 7, self.total_points)
                     direction = ai.compute_decision()
                     self.move(direction)
                 else:
@@ -114,6 +114,7 @@ class Game:
         self.surface.blit(label2, (50, 200))
         self.surface.blit(label3, (50, 300))
         self.reset()
+        time.sleep(3)
         auto = True
 
     def placeRandomTile(self):
