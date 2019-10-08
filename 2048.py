@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function
 import pygame, sys, time, math, random
 from pygame.locals import *
 from ai import *
+import os
 
 BLACK = (0, 0, 0)
 RED = (244, 67, 54)
@@ -158,6 +159,29 @@ class Game:
         return False
 
     def reset(self):
+        if largestTile(self.tileMatrix) > 256:
+            lastMoves = self.undoMat[-20:]
+            timestamp = str(int(time.time()))
+            count = 1
+            for m in lastMoves:
+                for i in range(0, self.board_size ** 2):
+                    self.tileMatrix[int(i / self.board_size)][i % self.board_size] = m[i]
+                self.total_points = m[self.board_size ** 2]
+                self.printMatrix()
+                traceDirectoryName = os.path.expanduser('~/Documents/2048_game_traces')
+                if not os.path.exists(traceDirectoryName):
+                    try:
+                        os.makedirs(traceDirectoryName)
+                    except:
+                        pass
+                directoryName = '{}/{}/{}'.format(traceDirectoryName, Gametree.botName, timestamp)
+                if not os.path.exists(directoryName):
+                    os.makedirs(directoryName)
+                filename = '{}/{}.jpg'.format(directoryName, str(count))
+                filename = os.path.abspath(filename)
+                count += 1
+                pygame.image.save(self.surface, filename)
+
         self.numPlays += 1
         # Perform statistic check
         largestValue = 0

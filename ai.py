@@ -15,6 +15,7 @@ MOVES = {0: 'up', 1: 'left', 2: 'down', 3: 'right'}
 class Gametree:
     """main class for the AI"""
     globalLargest = 0
+    botName = "Override"
 
     # Hint: Two operations are important. Grow a game tree, and then compute minimax score.
     # Hint: To grow a tree, you need to simulate the game one step.
@@ -34,7 +35,7 @@ class Gametree:
         largest = Gametree.globalLargest
         if (largest < 2048):
             self.depth_of_tree = 3
-        elif largest < 4096:
+        elif largest < 8192:
             self.depth_of_tree = 5
         else:
             self.depth_of_tree = 7
