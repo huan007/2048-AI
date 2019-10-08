@@ -14,6 +14,7 @@ MOVES = {0: 'up', 1: 'left', 2: 'down', 3: 'right'}
 
 class Gametree:
     """main class for the AI"""
+    globalLargest = 0
 
     # Hint: Two operations are important. Grow a game tree, and then compute minimax score.
     # Hint: To grow a tree, you need to simulate the game one step.
@@ -28,7 +29,9 @@ class Gametree:
         self.m_dupCount = 0
         self.m_memory_counts = {}
         self.m_memory = {}
-        largest = largestTile(root_state)
+        if root_state[0][0] != Gametree.globalLargest:
+            Gametree.globalLargest = largestTile(root_state)
+        largest = Gametree.globalLargest
         if (largest < 2048):
             self.depth_of_tree = 3
         elif largest < 4096:
