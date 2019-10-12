@@ -160,6 +160,7 @@ class Game:
 
     def reset(self):
         largest = largestTile(self.tileMatrix)
+        total_points = self.total_points
         if largest > 1024:
             lastMoves = self.undoMat[-20:]
             timestamp = str(int(time.time()))
@@ -175,7 +176,7 @@ class Game:
                         os.makedirs(traceDirectoryName)
                     except:
                         pass
-                directoryName = '{}/{}/{}'.format(traceDirectoryName, Gametree.botName, '{}_{}_{}'.format(largest, self.total_points, timestamp))
+                directoryName = '{}/{}/{}'.format(traceDirectoryName, Gametree.botName, '{}_{}_{}'.format(largest, total_points, timestamp))
                 if not os.path.exists(directoryName):
                     os.makedirs(directoryName)
                 filename = '{}/{}.jpg'.format(directoryName, str(count))
