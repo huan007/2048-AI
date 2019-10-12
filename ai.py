@@ -15,7 +15,7 @@ MOVES = {0: 'up', 1: 'left', 2: 'down', 3: 'right'}
 class Gametree:
     """main class for the AI"""
     globalLargest = 0
-    botName = "Override"
+    botName = "Override5"
 
     # Hint: Two operations are important. Grow a game tree, and then compute minimax score.
     # Hint: To grow a tree, you need to simulate the game one step.
@@ -34,11 +34,11 @@ class Gametree:
             Gametree.globalLargest = largestTile(root_state)
         largest = Gametree.globalLargest
         if (largest < 2048):
-            self.depth_of_tree = 3
+            self.depth_of_tree = 5
         elif largest < 8192:
             self.depth_of_tree = 5
         else:
-            self.depth_of_tree = 7
+            self.depth_of_tree = 5
 
     # expectimax for computing best move
     def expectimax(self, node):
@@ -73,10 +73,11 @@ class Gametree:
 
     # function to return best decision to game
     def compute_decision(self):
-        # grid = self.rootNode.state
-        # if (grid[3][0] == grid[2][1] == grid[3][1]):
-        #    if (grid[3][0] != 0) and (grid[2][1] != 0) and (grid[3][1] != 0):
-        #    return 3
+        grid = self.rootNode.state
+        if (grid[3][0] == grid[2][1] == grid[3][1]):
+            if (grid[3][0] != 0) and (grid[2][1] != 0) and (grid[3][1] != 0):
+                if (grid[0][0] != 0) and (grid[1][0] != 0) and (grid[2][0] != 0):
+                    return 3
         # This is where we should construct the tree
         Simulator.initAndBuildTree(self.rootNode, self.depth_of_tree, 0)
 
@@ -264,7 +265,6 @@ def terminal(node):
 
 # This function will calculate the payoff of any given state
 def payoff(node):
-    board_size = node.board_size
     board = node.state
     # Sorted values in tuples: (position, x, y)
     baseRating = 0
