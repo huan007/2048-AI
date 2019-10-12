@@ -159,7 +159,8 @@ class Game:
         return False
 
     def reset(self):
-        if largestTile(self.tileMatrix) > 256:
+        largest = largestTile(self.tileMatrix)
+        if largest > 1024:
             lastMoves = self.undoMat[-20:]
             timestamp = str(int(time.time()))
             count = 1
@@ -174,7 +175,7 @@ class Game:
                         os.makedirs(traceDirectoryName)
                     except:
                         pass
-                directoryName = '{}/{}/{}'.format(traceDirectoryName, Gametree.botName, timestamp)
+                directoryName = '{}/{}/{}'.format(traceDirectoryName, Gametree.botName, '{}_{}_{}'.format(largest, self.total_points, timestamp))
                 if not os.path.exists(directoryName):
                     os.makedirs(directoryName)
                 filename = '{}/{}.jpg'.format(directoryName, str(count))
@@ -199,7 +200,7 @@ class Game:
         print("---------Stats-----------")
         print("Games Played: ", self.numPlays)
         for tile in self.stats:
-            print(tile, ": ", self.stats[tile] / self.numPlays * 100, "%")
+            print(tile, ": ", self.stats[tile])
         self.total_points = 0
         self.surface.fill(BLACK)
         self.tileMatrix = [[0 for i in range(self.board_size)] for j in range(self.board_size)]
